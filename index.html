@@ -11,9 +11,9 @@
  <!--ICON-->
  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
  <link rel="shortcut icon" href="vgb.png" />
- <meta name="msapplication-TileColor" content="#000" />
-<meta name="msapplication-TileImage" content="vgb.png" />
-<meta name="theme-color" content="#000" />
+ <meta name="msapplication-TileColor" content="#ffffff" />
+<meta name="msapplication-TileImage" content="path/to/ms-icon-144x144.png" />
+<meta name="theme-color" content="#ffffff" />
 <link
 rel="apple-touch-icon"
 sizes="180x180"
@@ -60,113 +60,116 @@ href="vgb.png"
 <!-- Копирайт -->
 <div class="copyright">© 2024 Vlad Gubar, All rights reserved</div>
 
-    <script>
-        // Экраны
-        const startScreen = document.getElementById('start-screen');
-        const workTimerScreen = document.getElementById('work-timer-screen');
-        const doneScreen = document.getElementById('done-screen');
-        const breakTimerScreen = document.getElementById('break-timer-screen');
-        const workAgainScreen = document.getElementById('work-again-screen');
+<script>
+    // Экраны
+    const startScreen = document.getElementById('start-screen');
+    const workTimerScreen = document.getElementById('work-timer-screen');
+    const doneScreen = document.getElementById('done-screen');
+    const breakTimerScreen = document.getElementById('break-timer-screen');
+    const workAgainScreen = document.getElementById('work-again-screen');
 
-        // Кнопки
-        const startBtn = document.getElementById('start-btn');
-        const pauseBtnWork = document.getElementById('pause-btn-work');
-        const pauseBtnBreak = document.getElementById('pause-btn-break');
+    // Кнопки
+    const startBtn = document.getElementById('start-btn');
+    const pauseBtnWork = document.getElementById('pause-btn-work');
+    const pauseBtnBreak = document.getElementById('pause-btn-break');
 
-        // Таймеры
-        const workTimerDisplay = document.getElementById('work-timer');
-        const breakTimerDisplay = document.getElementById('break-timer');
-        const quoteDisplay = document.getElementById('quote');
+    // Таймеры
+    const workTimerDisplay = document.getElementById('work-timer');
+    const breakTimerDisplay = document.getElementById('break-timer');
+    const quoteDisplay = document.getElementById('quote');
 
-        const quotes = [
-           '"Focus on the process, not the result."',
-           '"Every step brings you closer to the goal."',
-           '"Difficulties are steps up."',
-           '"Dont stop, even if its hard."',
-           '"Small actions create big changes."'
-        ];
+    const quotes = [
+       '"Focus on the process, not the result."',
+       '"Every step brings you closer to the goal."',
+       '"Difficulties are steps up."',
+       '"Dont stop, even if its hard."',
+       '"Small actions create big changes."'
+    ];
 
+    let isPaused = false;
+    let currentTime = 0;
+    let timerInterval;
 
-        
-        let isPaused = false;
-        let timerInterval;
+    // Переход между экранами
+    function switchScreen(screen) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+    }
 
-        // Переход между экранами
-        function switchScreen(screen) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            screen.classList.add('active');
-        }
+    // Универсальная функция таймера
+    function startTimer(duration, display, onEnd, quoteUpdate = false) {
+        clearInterval(timerInterval); // Очищаем предыдущий интервал, если он есть
+        let time = duration;
+        let quoteIndex = 0;
+        isPaused = false;
 
-       // Универсальная функция таймера
-function startTimer(duration, display, onEnd, quoteUpdate = false) {
-    clearInterval(timerInterval); // Очищаем предыдущий интервал, если он есть
-    let time = duration;
-    let quoteIndex = 0;
-    isPaused = false;
+        // Инициализация экрана таймера
+        display.textContent = formatTime(time);
 
-    // Инициализация экрана таймера
-    const minutes = Math.floor(time / 60).toString().padStart(2, '0');
-    const seconds = (time % 60).toString().padStart(2, '0');
-    display.textContent = `${minutes}:${seconds}`;
+        // Таймер
+        timerInterval = setInterval(() => {
+            if (!isPaused) {
+                time--;
+                display.textContent = formatTime(time);
 
-    // Таймер
-    timerInterval = setInterval(() => {
-        if (!isPaused) {
-            const minutes = Math.floor(time / 60).toString().padStart(2, '0');
-            const seconds = (time % 60).toString().padStart(2, '0');
-            display.textContent = `${minutes}:${seconds}`;
+                // Обновление цитаты каждые 5 минут
+                if (quoteUpdate && time % 300 === 0 && time !== duration) {
+                    quoteDisplay.textContent = quotes[quoteIndex % quotes.length];
+                    quoteIndex++;
+                }
 
-            // Обновление цитаты каждые 5 минут
-            if (quoteUpdate && time % 300 === 0 && time !== duration) {
-                quoteDisplay.textContent = quotes[quoteIndex % quotes.length];
-                quoteIndex++;
+                if (time <= 0) {
+                    clearInterval(timerInterval);
+                    onEnd();
+                }
             }
+        }, 1000);
+    }
 
-            if (time <= 0) {
-                clearInterval(timerInterval);
-                onEnd();
-            }
+    // Форматирование времени в минуты:секунды
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const secondsLeft = (seconds % 60).toString().padStart(2, '0');
+        return `${minutes}:${secondsLeft}`;
+    }
 
-            time--;
-        }
-    }, 1000);
-}
+    // Старт рабочего таймера
+    function startWorkTimer() {
+        switchScreen(workTimerScreen);
+        currentTime = 1500; // 25 минут в секундах
+        quoteDisplay.textContent = quotes[0]; // Устанавливаем начальную цитату
 
-// Старт рабочего таймера
-function startWorkTimer() {
-    clearInterval(timerInterval); // Сброс таймера
-    quoteDisplay.textContent = quotes[0]; // Устанавливаем начальную цитату
-    switchScreen(workTimerScreen);
+        startTimer(currentTime, workTimerDisplay, () => {
+            switchScreen(doneScreen); // Переходим на экран "Ты сделал это!"
+            setTimeout(startBreakTimer, 5000); // Пауза 5 секунд, затем стартуем перерыв
+        }, true);
+    }
 
-    startTimer(1500, workTimerDisplay, () => {
-        switchScreen(doneScreen);
-        setTimeout(startBreakTimer, 5000); // Пауза 5 секунд
-    }, true);
-}
+    // Старт таймера на перерыв
+    function startBreakTimer() {
+        switchScreen(breakTimerScreen);
+        currentTime = 300; // 5 минут в секундах
 
-// Старт таймера на перерыв
-function startBreakTimer() {
-    clearInterval(timerInterval); // Сброс таймера
-    switchScreen(breakTimerScreen);
+        startTimer(currentTime, breakTimerDisplay, () => {
+            switchScreen(workAgainScreen); // Переходим на экран "Пора за работу"
+            setTimeout(startWorkTimer, 5000); // Пауза 5 секунд, затем стартуем рабочий таймер
+        });
+    }
 
-    startTimer(300, breakTimerDisplay, () => {
-        switchScreen(workAgainScreen);
-        setTimeout(startWorkTimer, 5000); // Пауза 5 секунд
+    // Обработчики событий
+    startBtn.addEventListener('click', startWorkTimer);
+
+    pauseBtnWork.addEventListener('click', () => {
+        isPaused = !isPaused;
+        pauseBtnWork.textContent = isPaused ? 'continue' : 'pause';
     });
-}
 
-// Обработчики событий
-startBtn.addEventListener('click', startWorkTimer);
+    pauseBtnBreak.addEventListener('click', () => {
+        isPaused = !isPaused;
+        pauseBtnBreak.textContent = isPaused ? 'continue' : 'pause';
+    });
+</script>
 
-pauseBtnWork.addEventListener('click', () => {
-    isPaused = !isPaused;
-    pauseBtnWork.textContent = isPaused ? 'continue' : 'pause';
-});
-
-pauseBtnBreak.addEventListener('click', () => {
-    isPaused = !isPaused;
-    pauseBtnBreak.textContent = isPaused ? 'continue' : 'pause';
-});
-    </script>
+<script src="timer-worker.js"></script>
 </body>
 </html>
