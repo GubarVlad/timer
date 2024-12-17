@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Literata", serif;
+    font-optical-sizing: auto;
+    font-weight: 250;
+}
+
+body {
+    height: 100%;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    overflow: hidden;
+    transition: background 0.5s;
+}
+
+
+
+h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+
+
+#timer {
+    font-size: 5em;
+    margin: 20px 0;
+}
+
+#quote {
+    font-size: 1.2em;
+    color: #ccc;
+    margin-top: 10px;
+}
+
+button {
+    background-color: #000;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    cursor: pointer;
+    border-radius: 30px;
+    margin-top: 20px;
+    padding-left: 100px;
+    padding-right: 100px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #666;
+}
+
+/* Экраны */
+.screen {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 1.5s ease forwards; /* Анимация появления */
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Для анимации текста */
+.fade-text { 
+    font-family: "Literata", serif;
+    font-optical-sizing: auto;
+    font-weight: 250;
+    font-style: normal;
+    opacity: 0;
+    animation: fadeInText 1.5s ease forwards;
+}
+
+.fade-text-timer-main {
+    font-family: "Literata", serif;
+    font-size: 100px;
+    font-optical-sizing: auto;
+    font-weight: 250;
+    font-style: normal;
+    opacity: 0;
+    animation: fadeInText 1.5s ease forwards;
+}
+
+.fade-text-main {
+    font-family: "Literata", serif;
+    font-size: 100px;
+    font-optical-sizing: auto;
+    font-weight: 250;
+    font-style: normal;
+    opacity: 0;
+    animation: fadeInText 1.5s ease forwards;
+}
+
+@keyframes fadeInText {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.copyright {
+    position: fixed; /* Фиксированное положение на экране */
+    bottom: 10px; /* Отступ снизу */
+    left: 10px; /* Отступ слева */
+    font-size: 14px; /* Размер шрифта */
+    color: rgba(255, 255, 255, 0.7); /* Полупрозрачный белый текст */
+    font-family: 'Montserrat', sans-serif; /* Ваш шрифт */
+}

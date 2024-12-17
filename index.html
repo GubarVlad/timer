@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just Focus</title>
+<link rel="stylesheet" href="mine.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+ <!--ICON-->
+ <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+ <link rel="shortcut icon" href="vgb.png" />
+ <meta name="msapplication-TileColor" content="#ffffff" />
+<meta name="msapplication-TileImage" content="path/to/ms-icon-144x144.png" />
+<meta name="theme-color" content="#ffffff" />
+<link
+rel="apple-touch-icon"
+sizes="180x180"
+href="vgb.png"
+/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<div class="backg">
+<div class="backg-overflow"></div>
+</div>
+</head>
+<body>
+    <!-- Начальный экран -->
+    <div id="start-screen" class="screen active">
+        <h1 class="fade-text-main">JUST FOCUS</h1>
+        <button id="start-btn">start</button>
+    </div>
+    <!-- Основной таймер -->
+    <div id="work-timer-screen" class="screen">
+        <div id="work-timer" class="fade-text-timer-main">25:00</div>
+        <p id="quote" class="fade-text">"Focus on the process, not the result."</p>
+        <button id="pause-btn-work">pause</button>
+    </div>
+
+    <!-- Экран "Ты сделал это!" -->
+    <div id="done-screen" class="screen">
+        <h1 class="fade-text">You did it!</h1>
+    </div>
+
+    <!-- Таймер на перерыв -->
+    <div id="break-timer-screen" class="screen">
+        <div id="break-timer" class="fade-text-timer-main">05:00</div>
+        <p class="fade-text">Relax...</p>
+        <button id="pause-btn-break">pause</button>
+    </div>
+
+    <!-- Экран "Пора за работу" -->
+    <div id="work-again-screen" class="screen">
+        <h1 class="fade-text">It's time to get to work!</h1>
+    </div>
+
+<!-- Копирайт -->
+<div class="copyright">© 2024 Vlad Gubar, All rights reserved</div>
+
+    <script>
+        // Экраны
+        const startScreen = document.getElementById('start-screen');
+        const workTimerScreen = document.getElementById('work-timer-screen');
+        const doneScreen = document.getElementById('done-screen');
+        const breakTimerScreen = document.getElementById('break-timer-screen');
+        const workAgainScreen = document.getElementById('work-again-screen');
+
+        // Кнопки
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtnWork = document.getElementById('pause-btn-work');
+        const pauseBtnBreak = document.getElementById('pause-btn-break');
+
+        // Таймеры
+        const workTimerDisplay = document.getElementById('work-timer');
+        const breakTimerDisplay = document.getElementById('break-timer');
+        const quoteDisplay = document.getElementById('quote');
+
+        const quotes = [
+           '"Focus on the process, not the result."',
+           '"Every step brings you closer to the goal."',
+           '"Difficulties are steps up."',
+           '"Dont stop, even if its hard."',
+           '"Small actions create big changes."'
+        ];
+
+
+        
+        let isPaused = false;
+        let timerInterval;
+
+        // Переход между экранами
+        function switchScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
+        }
+
+       // Универсальная функция таймера
+function startTimer(duration, display, onEnd, quoteUpdate = false) {
+    clearInterval(timerInterval); // Очищаем предыдущий интервал, если он есть
+    let time = duration;
+    let quoteIndex = 0;
+    isPaused = false;
+
+    // Инициализация экрана таймера
+    const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+    const seconds = (time % 60).toString().padStart(2, '0');
+    display.textContent = `${minutes}:${seconds}`;
+
+    // Таймер
+    timerInterval = setInterval(() => {
+        if (!isPaused) {
+            const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+            const seconds = (time % 60).toString().padStart(2, '0');
+            display.textContent = `${minutes}:${seconds}`;
+
+            // Обновление цитаты каждые 5 минут
+            if (quoteUpdate && time % 300 === 0 && time !== duration) {
+                quoteDisplay.textContent = quotes[quoteIndex % quotes.length];
+                quoteIndex++;
+            }
+
+            if (time <= 0) {
+                clearInterval(timerInterval);
+                onEnd();
+            }
+
+            time--;
+        }
+    }, 1000);
+}
+
+// Старт рабочего таймера
+function startWorkTimer() {
+    clearInterval(timerInterval); // Сброс таймера
+    quoteDisplay.textContent = quotes[0]; // Устанавливаем начальную цитату
+    switchScreen(workTimerScreen);
+
+    startTimer(1500, workTimerDisplay, () => {
+        switchScreen(doneScreen);
+        setTimeout(startBreakTimer, 5000); // Пауза 5 секунд
+    }, true);
+}
+
+// Старт таймера на перерыв
+function startBreakTimer() {
+    clearInterval(timerInterval); // Сброс таймера
+    switchScreen(breakTimerScreen);
+
+    startTimer(300, breakTimerDisplay, () => {
+        switchScreen(workAgainScreen);
+        setTimeout(startWorkTimer, 5000); // Пауза 5 секунд
+    });
+}
+
+// Обработчики событий
+startBtn.addEventListener('click', startWorkTimer);
+
+pauseBtnWork.addEventListener('click', () => {
+    isPaused = !isPaused;
+    pauseBtnWork.textContent = isPaused ? 'continue' : 'pause';
+});
+
+pauseBtnBreak.addEventListener('click', () => {
+    isPaused = !isPaused;
+    pauseBtnBreak.textContent = isPaused ? 'continue' : 'pause';
+});
+    </script>
+</body>
+</html>
